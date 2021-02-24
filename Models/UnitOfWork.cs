@@ -8,29 +8,43 @@ namespace BikeRentApp.Models
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly BikeContext _context;
+        private readonly BikeContext _context = new BikeContext();
+        private  BikeRepository bikeRepository;
 
-        public UnitOfWork(BikeContext context)
+        public BikeRepository Bikes
         {
-           
-                _context = context;
-                Bikes = new BikeRepository(_context);
-               
-            
+            get
+            {
+                if (bikeRepository == null)
+                    bikeRepository = new BikeRepository(_context);
+                return bikeRepository;
+            }
         }
+        
 
-        public IBikeRepository Bikes { get; private set; }
-
-
+        private bool disposed = false;
 
         public int Complete()
         {
             return _context.SaveChanges();
         }
 
+        public virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    _context.Dispose();
+                }
+                this.disposed = true;
+            }
+        }
+
         public void Dispose()
         {
-            _context.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }
