@@ -44,13 +44,25 @@ namespace BikeRentApp.Controller
 
         // POST api/<BikeController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<ActionResult<BikeDTO>> PostBike(BikeDTO bikeDTO)
         {
+            var bike = new Bike
+            {
+                IsRented = bikeDTO.IsRented,
+                Name = bikeDTO.Name,
+                RentPrice= bikeDTO.RentPrice,
+                BikeType = bikeDTO.BikeType
+            };
+            _context.Bikes.Add(bike);
+            await _context.Bikes.BikeContext.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(Get), new { id = bikeDTO.ID }, bikeDTO);
+           
         }
 
         // PUT api/<BikeController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutManagedNotes(long id, BikeDTO bikeDTO)
+        public async Task<IActionResult> PutBike(long id, BikeDTO bikeDTO)
         {
             if (id != bikeDTO.ID)
             {
@@ -59,24 +71,26 @@ namespace BikeRentApp.Controller
 
             Bike bike = await _context.Bikes.FindAsync(id);
 
-            if (managedNotes == null)
+            if (bike == null)
             {
                 return NotFound();
 
             }
 
-            managedNotes.IsComplete = managedNotesDTO.IsComplete;
-            managedNotes.Name = managedNotesDTO.Name;
-
-            _context.Entry(managedNotes).State = EntityState.Modified;
+            bike.IsRented = bikeDTO.IsRented;
+            bike.Name = bikeDTO.Name;
+            bike.RentPrice = bikeDTO.RentPrice;
+            
+           
+            _context.Bikes.BikeContext.Entry(bike).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                 _context.Bikes.BikeContext.SaveChanges();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ManagedNotesExists(id))
+                if (!BikeExists(id))
                 {
                     return NotFound();
                 }
@@ -91,8 +105,23 @@ namespace BikeRentApp.Controller
 
         // DELETE api/<BikeController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            Bike bike =  await _context.Bikes.FindAsync(id);
+            if (bike == null)
+            {
+                return NotFound();
+            }
+
+            _context.Bikes.Remove(bike);
+            await _context.Bikes.BikeContext.SaveChangesAsync();
+
+            return NoContent();
         }
+
+
+
+
+        private bool BikeExists(long id) => _context.Bikes.BikeContext.Bikes.Any(x=>x.ID==id);
     }
 }

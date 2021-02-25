@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,20 +9,27 @@ using System.Threading.Tasks;
 
 namespace BikeRentApp.Models.DAL
 {
-    public class BikeContext : System.Data.Entity.DbContext
+    public class BikeContext : DbContext
     {
-        public BikeContext()
-            : base("name=BikeContext")
+
+        public BikeContext() {  Database.EnsureCreated();}
+        public BikeContext(DbContextOptions<BikeContext> options)
+            :base(options)
         {
-            this.Configuration.LazyLoadingEnabled = false;
+           
+           
         }
 
-        public virtual System.Data.Entity.DbSet<Bike> Bikes { get; set; }
-       
-
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        public virtual DbSet<Bike> Bikes { get; set; }
+      
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            modelBuilder.Configurations.Add(new BikesConfiguration());
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=bikerentapp;Trusted_Connection=True;");
+            }
         }
+
+
     }
 }
