@@ -26,7 +26,7 @@ namespace BikeRentApp.Models.DAL
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=bikerentapp;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=bikerentappdb;Trusted_Connection=True;");
             }
         }
 
